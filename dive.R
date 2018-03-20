@@ -170,6 +170,11 @@ dive <- function(x, return = "cons") {
   # add missing information
   mis <- which(!names(x.formal) %in% names(x.argl))
   if(length(mis)>0) {
+    num.ind <- suppressWarnings(which(!is.na(as.numeric(x.formal))))
+    x.formal[num.ind] <- as.numeric(x.formal[num.ind])
+    x.formal[sapply(x.formal, is.character)] <- paste0("\"", 
+                                                       x.formal[sapply(x.formal, is.character)], 
+                                                       "\"")
     x.argl <- append(x.argl, x.formal[mis])
   }
   
@@ -178,11 +183,6 @@ dive <- function(x, return = "cons") {
   
   OUT <- switch(return,
                 cons = {
-                  num.ind <- suppressWarnings(which(!is.na(as.numeric(x.argl))))
-                  x.argl[num.ind] <- as.numeric(x.argl[num.ind])
-                  if (any(sapply(x.argl, is.character))) {
-                  x.argl[sapply(x.argl, is.character)] <- paste0("\"", x.argl[sapply(x.argl, is.character)], "\"")
-                  }
                   OUT <- paste(names(x.argl), x.argl, sep = " = ")
                   return(cat(paste(OUT, collapse = "\n")))
                 }, 
