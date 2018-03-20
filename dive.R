@@ -69,6 +69,9 @@
 #' dive(my.string.debug, return = "cons")
 dive <- function(x, return = "cons") {
   
+  # require
+  require(stringr)
+  
   # isolate function
   FUN <- regmatches(x, regexpr("^[^\\(]+", x))
   
@@ -90,7 +93,7 @@ dive <- function(x, return = "cons") {
   # fix x.args due to ,
   open <- str_count(x.args, "\\(")
   open[1] <- open[1] - 1
-  close <- str_count(x.args, "\\)")
+  close <- as.numeric(str_count(x.args, "\\)"))
   #close[length(close)] <- close[length(close)] - 1  
 
   if (!identical(open,close)) {
@@ -175,6 +178,11 @@ dive <- function(x, return = "cons") {
   
   OUT <- switch(return,
                 cons = {
+                  num.ind <- suppressWarnings(which(!is.na(as.numeric(x.argl))))
+                  x.argl[num.ind] <- as.numeric(x.argl[num.ind])
+                  if (any(sapply(x.argl, is.character))) {
+                  x.argl[sapply(x.argl, is.character)] <- paste0("\"", x.argl[sapply(x.argl, is.character)], "\"")
+                  }
                   OUT <- paste(names(x.argl), x.argl, sep = " = ")
                   return(cat(paste(OUT, collapse = "\n")))
                 }, 
